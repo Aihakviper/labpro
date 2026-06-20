@@ -90,6 +90,24 @@ their own borrowing history. Member deactivation disables login and revokes acti
 Borrowing-history responses are currently empty because loans are intentionally deferred to
 the borrowing and returning phase.
 
+## Book catalog
+
+All authenticated users can browse the catalog and search by title, author, or ISBN:
+
+- `GET /api/v1/books`
+- `GET /api/v1/books/{book_id}`
+
+Supported list filters include `q`, `title`, `author`, `isbn`, and `available_only`.
+
+Administrators and librarians can manage catalog records:
+
+- `POST /api/v1/books`
+- `PATCH /api/v1/books/{book_id}`
+- `DELETE /api/v1/books/{book_id}`
+
+Availability is calculated from `total_copies` and `available_copies`. Books with borrowed
+copies cannot be deleted, and total stock cannot be reduced below borrowed stock.
+
 ## Health checks
 
 - `GET /health/live`: confirms that the API process is running.
