@@ -137,6 +137,25 @@ daily rate used at calculation time, so later configuration changes do not alter
 Administrators configure the daily rate. Administrators and librarians record partial or full
 payments and can filter outstanding fines. Members can view only their own fines.
 
+## Reservations
+
+Active members can reserve books only when no copies are available. Reservations follow a
+FIFO queue:
+
+```text
+waiting → ready → fulfilled
+```
+
+Members may cancel waiting or ready reservations. When a ready reservation is cancelled, the
+held copy is transferred to the next waiting member or returned to general availability.
+
+- `POST /api/v1/reservations`
+- `GET /api/v1/reservations/me`
+- `GET /api/v1/reservations/{reservation_id}`
+- `PATCH /api/v1/reservations/{reservation_id}`
+- `DELETE /api/v1/reservations/{reservation_id}`
+- `GET /api/v1/reservations` — staff queue management
+
 ## Health checks
 
 - `GET /health/live`: confirms that the API process is running.

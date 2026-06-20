@@ -1,6 +1,15 @@
 from fastapi import APIRouter
 
-from app.api.routes import auth, books, fines, health, loans, members, users
+from app.api.routes import (
+    auth,
+    books,
+    fines,
+    health,
+    loans,
+    members,
+    reservations,
+    users,
+)
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -28,4 +37,9 @@ api_router.include_router(
     fines.router,
     prefix=f"{settings.api_v1_prefix}/fines",
     tags=["fines"],
+)
+api_router.include_router(
+    reservations.router,
+    prefix=f"{settings.api_v1_prefix}/reservations",
+    tags=["reservations"],
 )

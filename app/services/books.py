@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models.book import Book
 from app.models.loan import Loan
+from app.models.reservation import Reservation
 from app.schemas.book import BookCreate, BookUpdate, normalize_isbn
 
 
@@ -22,6 +23,10 @@ class BookHasBorrowedCopiesError(Exception):
 
 
 class BookHasLoanHistoryError(Exception):
+    pass
+
+
+class BookHasReservationHistoryError(Exception):
     pass
 
 
@@ -109,5 +114,10 @@ def delete_book(db: Session, book: Book) -> None:
     )
     if has_loan_history is not None:
         raise BookHasLoanHistoryError
+    has_reservation_history = db.scalar(
+        select(Reservation.id).where(Reservation.book_id == book.id).limit(1)
+    )
+    if has_reservation_history is not None:
+        raise BookHasReservationHistoryError
     db.delete(book)
     db.commit()

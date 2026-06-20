@@ -7,6 +7,7 @@ from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from app.models.loan import Loan
+    from app.models.reservation import Reservation
 
 
 class Book(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -29,6 +30,7 @@ class Book(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     total_copies: Mapped[int] = mapped_column(Integer, nullable=False)
     available_copies: Mapped[int] = mapped_column(Integer, nullable=False)
     loans: Mapped[list["Loan"]] = relationship(back_populates="book")
+    reservations: Mapped[list["Reservation"]] = relationship(back_populates="book")
 
     @property
     def borrowed_copies(self) -> int:

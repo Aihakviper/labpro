@@ -13,6 +13,7 @@ from app.schemas.book import BookCreate, BookRead, BookUpdate
 from app.services.books import (
     BookHasBorrowedCopiesError,
     BookHasLoanHistoryError,
+    BookHasReservationHistoryError,
     InvalidInventoryReductionError,
     IsbnAlreadyExistsError,
     create_book,
@@ -125,4 +126,9 @@ def remove_book(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="A book with loan history cannot be deleted",
+        ) from exc
+    except BookHasReservationHistoryError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A book with reservation history cannot be deleted",
         ) from exc

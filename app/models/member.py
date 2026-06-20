@@ -9,6 +9,7 @@ from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from app.models.loan import Loan
+    from app.models.reservation import Reservation
     from app.models.user import User
 
 
@@ -45,3 +46,4 @@ class Member(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     user: Mapped["User"] = relationship(back_populates="member_profile")
     loans: Mapped[list["Loan"]] = relationship(back_populates="member")
+    reservations: Mapped[list["Reservation"]] = relationship(back_populates="member")

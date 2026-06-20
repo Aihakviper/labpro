@@ -102,6 +102,9 @@ def update_member(db: Session, member: Member, data: MemberUpdate) -> Member:
 
 
 def deactivate_member(db: Session, member: Member) -> Member:
+    from app.services.reservations import cancel_member_active_reservations
+
+    cancel_member_active_reservations(db, member.id)
     if member.is_active:
         member.is_active = False
         member.deactivated_at = datetime.now(UTC)

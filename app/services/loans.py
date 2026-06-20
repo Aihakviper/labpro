@@ -11,6 +11,10 @@ from app.models.member import Member
 from app.models.user import User
 from app.schemas.loan import LoanCreate
 from app.services.fines import create_overdue_fine
+from app.services.reservations import (
+    fulfill_ready_reservation,
+    promote_next_waiting_reservation,
+)
 
 
 class MemberNotFoundError(Exception):
@@ -72,10 +76,16 @@ def issue_book(db: Session, data: LoanCreate, issued_by: User) -> Loan:
     book = db.scalar(select(Book).where(Book.id == data.book_id).with_for_update())
     if book is None:
         raise BookNotFoundError
-    if book.available_copies <= 0:
+    ready_reservation = fulfill_ready_reservation(
+        db,
+        member_id=member.id,
+        book_id=book.id,
+    )
+    if ready_reservation is None and book.available_copies <= 0:
         raise BookUnavailableError
 
-    book.available_copies -= 1
+    if ready_reservation is None:
+        book.available_copies -= 1
     loan = Loan(
         member_id=member.id,
         book_id=book.id,
@@ -107,6 +117,7 @@ def return_book(db: Session, loan_id: UUID, returned_by: User) -> Loan:
     loan.returned_at = returned_at
     loan.returned_by_user_id = returned_by.id
     book.available_copies += 1
+    promote_next_waiting_reservation(db, book)
     create_overdue_fine(db, loan, returned_at)
     db.commit()
     return get_loan(db, loan.id)  # type: ignore[return-value]
