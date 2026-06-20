@@ -1,12 +1,15 @@
 # Librarian Pro API
 
-Phase 0 backend foundation for Librarian Pro. It includes:
+Backend foundation and Phase 1 authentication for Librarian Pro. It includes:
 
 - FastAPI application structure
 - PostgreSQL and SQLAlchemy 2
 - Alembic migrations
-- JWT access-token authentication
+- JWT access and refresh tokens with server-side revocation
 - Role-ready user model (`admin`, `librarian`, `member`)
+- Administrator-managed user accounts
+- Reusable role-based authorization dependencies
+- Secure logout, refresh rotation, and password changes
 - Docker Compose development environment
 - Liveness and database-readiness endpoints
 
@@ -46,7 +49,29 @@ The API documentation is available at `http://localhost:8000/docs`.
 - `username`: the user's email address
 - `password`: the user's password
 
-Use the returned bearer token with `GET /api/v1/auth/me`.
+The response contains an access token and refresh token.
+
+Available endpoints:
+
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
+- `GET /api/v1/auth/me`
+- `POST /api/v1/auth/change-password`
+
+Refresh tokens are rotated. Refresh, logout, password changes, account deactivation,
+and role changes revoke the affected session immediately.
+
+## User and role administration
+
+Only active administrators can access:
+
+- `POST /api/v1/users`
+- `GET /api/v1/users`
+- `GET /api/v1/users/{user_id}`
+- `PATCH /api/v1/users/{user_id}`
+
+The API prevents deactivating or demoting the last active administrator.
 
 ## Health checks
 

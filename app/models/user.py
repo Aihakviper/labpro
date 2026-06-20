@@ -1,9 +1,13 @@
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Enum, String, true
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.models.auth_session import AuthSession
 
 
 class UserRole(StrEnum):
@@ -33,4 +37,8 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         default=True,
         server_default=true(),
         nullable=False,
+    )
+    auth_sessions: Mapped[list["AuthSession"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
     )
