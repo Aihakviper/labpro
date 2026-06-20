@@ -156,6 +156,25 @@ held copy is transferred to the next waiting member or returned to general avail
 - `DELETE /api/v1/reservations/{reservation_id}`
 - `GET /api/v1/reservations` — staff queue management
 
+## Notifications
+
+Members receive persistent in-app notifications for:
+
+- successful book issue and return
+- overdue loans
+- reservation creation, readiness, and cancellation
+- fine assessment and fine payments
+
+Member endpoints:
+
+- `GET /api/v1/notifications`
+- `GET /api/v1/notifications/unread-count`
+- `POST /api/v1/notifications/{notification_id}/read`
+- `POST /api/v1/notifications/read-all`
+
+Staff can run `POST /api/v1/notifications/process-overdue`. This endpoint is idempotent per
+loan and calendar day and can later be called by a cron job or task scheduler.
+
 ## Health checks
 
 - `GET /health/live`: confirms that the API process is running.

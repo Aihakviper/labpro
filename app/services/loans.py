@@ -8,9 +8,11 @@ from app.core.config import get_settings
 from app.models.book import Book
 from app.models.loan import Loan, LoanStatus
 from app.models.member import Member
+from app.models.notification import NotificationType
 from app.models.user import User
 from app.schemas.loan import LoanCreate
 from app.services.fines import create_overdue_fine
+from app.services.notifications import create_notification
 from app.services.reservations import (
     fulfill_ready_reservation,
     promote_next_waiting_reservation,
@@ -95,6 +97,17 @@ def issue_book(db: Session, data: LoanCreate, issued_by: User) -> Loan:
         status=LoanStatus.BORROWED,
     )
     db.add(loan)
+    db.flush()
+    create_notification(
+        db,
+        member_id=member.id,
+        notification_type=NotificationType.LOAN_ISSUED,
+        title="Book issued successfully",
+        message=f'"{book.title}" has been issued to you and is due on {due_at.date()}.',
+        event_key=f"loan-issued:{loan.id}",
+        related_entity_type="loan",
+        related_entity_id=loan.id,
+    )
     db.commit()
     return get_loan(db, loan.id)  # type: ignore[return-value]
 
@@ -118,6 +131,16 @@ def return_book(db: Session, loan_id: UUID, returned_by: User) -> Loan:
     loan.returned_by_user_id = returned_by.id
     book.available_copies += 1
     promote_next_waiting_reservation(db, book)
+    create_notification(
+        db,
+        member_id=loan.member_id,
+        notification_type=NotificationType.LOAN_RETURNED,
+        title="Book returned successfully",
+        message=f'"{book.title}" was returned successfully.',
+        event_key=f"loan-returned:{loan.id}",
+        related_entity_type="loan",
+        related_entity_id=loan.id,
+    )
     create_overdue_fine(db, loan, returned_at)
     db.commit()
     return get_loan(db, loan.id)  # type: ignore[return-value]

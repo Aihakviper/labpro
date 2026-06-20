@@ -7,7 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.models.book import Book
 from app.models.member import Member
+from app.models.notification import NotificationType
 from app.models.reservation import Reservation, ReservationStatus
+from app.services.notifications import create_notification
 
 
 class ReservationNotFoundError(Exception):
@@ -56,6 +58,17 @@ def create_reservation(db: Session, member: Member, book_id: UUID) -> Reservatio
     )
     db.add(reservation)
     try:
+        db.flush()
+        create_notification(
+            db,
+            member_id=member.id,
+            notification_type=NotificationType.RESERVATION_CREATED,
+            title="Reservation confirmed",
+            message=f'You joined the reservation queue for "{book.title}".',
+            event_key=f"reservation-created:{reservation.id}",
+            related_entity_type="reservation",
+            related_entity_id=reservation.id,
+        )
         db.commit()
     except IntegrityError as exc:
         db.rollback()
@@ -140,6 +153,16 @@ def promote_next_waiting_reservation(
     reservation.status = ReservationStatus.READY
     reservation.ready_at = datetime.now(UTC)
     book.available_copies -= 1
+    create_notification(
+        db,
+        member_id=reservation.member_id,
+        notification_type=NotificationType.RESERVATION_READY,
+        title="Reserved book available",
+        message=f'"{book.title}" is now ready for collection.',
+        event_key=f"reservation-ready:{reservation.id}",
+        related_entity_type="reservation",
+        related_entity_id=reservation.id,
+    )
     return reservation
 
 
@@ -156,6 +179,16 @@ def cancel_reservation(
     was_ready = reservation.status == ReservationStatus.READY
     reservation.status = ReservationStatus.CANCELLED
     reservation.cancelled_at = datetime.now(UTC)
+    create_notification(
+        db,
+        member_id=reservation.member_id,
+        notification_type=NotificationType.RESERVATION_CANCELLED,
+        title="Reservation cancelled",
+        message="Your book reservation was cancelled successfully.",
+        event_key=f"reservation-cancelled:{reservation.id}",
+        related_entity_type="reservation",
+        related_entity_id=reservation.id,
+    )
 
     if was_ready:
         book = db.scalar(

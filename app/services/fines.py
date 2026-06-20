@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.config import get_settings
 from app.models.fine import Fine, FineConfig, FinePayment, FineStatus
 from app.models.loan import Loan
+from app.models.notification import NotificationType
 from app.models.user import User
+from app.services.notifications import create_notification
 
 MONEY_QUANTUM = Decimal("0.01")
 
@@ -67,6 +69,19 @@ def create_overdue_fine(db: Session, loan: Loan, returned_at: datetime) -> Fine 
         status=FineStatus.OUTSTANDING,
     )
     db.add(fine)
+    db.flush()
+    create_notification(
+        db,
+        member_id=loan.member_id,
+        notification_type=NotificationType.FINE_ASSESSED,
+        title="Overdue fine assessed",
+        message=(
+            f"A fine of {amount:.2f} was assessed for {overdue_days} overdue day(s)."
+        ),
+        event_key=f"fine-assessed:{fine.id}",
+        related_entity_type="fine",
+        related_entity_id=fine.id,
+    )
     return fine
 
 
@@ -114,7 +129,7 @@ def record_payment(
     fine = (
         db.execute(
             select(Fine)
-            .options(joinedload(Fine.payments))
+            .options(joinedload(Fine.payments), joinedload(Fine.loan))
             .where(Fine.id == fine_id)
             .with_for_update()
         )
@@ -138,9 +153,23 @@ def record_payment(
         paid_at=paid_at,
     )
     fine.payments.append(payment)
+    db.flush()
     fine.amount_paid = (fine.amount_paid + payment_amount).quantize(MONEY_QUANTUM)
     if fine.amount_paid == fine.amount:
         fine.status = FineStatus.PAID
         fine.paid_at = paid_at
+    create_notification(
+        db,
+        member_id=fine.loan.member_id,
+        notification_type=NotificationType.FINE_PAYMENT,
+        title="Fine payment recorded",
+        message=(
+            f"Your payment of {payment_amount:.2f} was recorded. "
+            f"Outstanding balance: {fine.outstanding_amount:.2f}."
+        ),
+        event_key=f"fine-payment:{payment.id}",
+        related_entity_type="fine",
+        related_entity_id=fine.id,
+    )
     db.commit()
     return get_fine(db, fine.id)  # type: ignore[return-value]

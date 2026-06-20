@@ -7,6 +7,7 @@ from app.api.routes import (
     health,
     loans,
     members,
+    notifications,
     reservations,
     users,
 )
@@ -42,4 +43,9 @@ api_router.include_router(
     reservations.router,
     prefix=f"{settings.api_v1_prefix}/reservations",
     tags=["reservations"],
+)
+api_router.include_router(
+    notifications.router,
+    prefix=f"{settings.api_v1_prefix}/notifications",
+    tags=["notifications"],
 )
