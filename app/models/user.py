@@ -8,6 +8,7 @@ from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from app.models.auth_session import AuthSession
+    from app.models.member import Member
 
 
 class UserRole(StrEnum):
@@ -41,4 +42,9 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     auth_sessions: Mapped[list["AuthSession"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
+    )
+    member_profile: Mapped["Member | None"] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
     )

@@ -73,6 +73,23 @@ Only active administrators can access:
 
 The API prevents deactivating or demoting the last active administrator.
 
+## Member management
+
+Administrators and librarians can register and manage members:
+
+- `POST /api/v1/members`
+- `GET /api/v1/members`
+- `GET /api/v1/members/{member_id}`
+- `PATCH /api/v1/members/{member_id}`
+- `POST /api/v1/members/{member_id}/deactivate`
+- `GET /api/v1/members/{member_id}/borrowing-history`
+
+Members can access their own profile through `GET /api/v1/members/me` and can view only
+their own borrowing history. Member deactivation disables login and revokes active sessions.
+
+Borrowing-history responses are currently empty because loans are intentionally deferred to
+the borrowing and returning phase.
+
 ## Health checks
 
 - `GET /health/live`: confirms that the API process is running.

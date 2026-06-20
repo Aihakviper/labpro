@@ -28,6 +28,11 @@ def create_user_account(
     db: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(admin_required)],
 ) -> User:
+    if data.role == UserRole.MEMBER:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Member accounts must be created through the member registration endpoint",
+        )
     try:
         return create_user(db, data)
     except EmailAlreadyExistsError as exc:
@@ -69,6 +74,25 @@ def update_user_account(
     user = get_user(db, user_id)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if data.role == UserRole.MEMBER and user.member_profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A member profile is required before assigning the member role",
+        )
+    if (
+        user.member_profile is not None
+        and data.role is not None
+        and data.role != UserRole.MEMBER
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with a member profile must retain the member role",
+        )
+    if user.member_profile is not None and data.is_active is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Member activation status must be managed through the member endpoint",
+        )
 
     was_active = user.is_active
     previous_role = user.role
