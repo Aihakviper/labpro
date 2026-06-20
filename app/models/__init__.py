@@ -1,7 +1,20 @@
 from app.models.auth_session import AuthSession
 from app.models.book import Book
+from app.models.fine import Fine, FineConfig, FinePayment, FineStatus
 from app.models.loan import Loan, LoanStatus
 from app.models.member import Member
 from app.models.user import User, UserRole
 
-__all__ = ["AuthSession", "Book", "Loan", "LoanStatus", "Member", "User", "UserRole"]
+__all__ = [
+    "AuthSession",
+    "Book",
+    "Fine",
+    "FineConfig",
+    "FinePayment",
+    "FineStatus",
+    "Loan",
+    "LoanStatus",
+    "Member",
+    "User",
+    "UserRole",
+]

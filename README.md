@@ -122,6 +122,21 @@ Returning records the return date and restores one available copy. Inactive memb
 unavailable books, expired due dates, duplicate returns, and members above the configured
 active-loan limit are rejected.
 
+## Fine management
+
+Overdue fines are calculated automatically when a book is returned. The fine snapshots the
+daily rate used at calculation time, so later configuration changes do not alter history.
+
+- `GET /api/v1/fines`
+- `GET /api/v1/fines/me`
+- `GET /api/v1/fines/{fine_id}`
+- `POST /api/v1/fines/{fine_id}/payments`
+- `GET /api/v1/fines/config`
+- `PATCH /api/v1/fines/config`
+
+Administrators configure the daily rate. Administrators and librarians record partial or full
+payments and can filter outstanding fines. Members can view only their own fines.
+
 ## Health checks
 
 - `GET /health/live`: confirms that the API process is running.

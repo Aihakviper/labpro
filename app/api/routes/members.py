@@ -14,6 +14,7 @@ from app.schemas.member import (
     MemberRead,
     MemberUpdate,
 )
+from app.services.loans import get_member_loan_history
 from app.services.members import (
     MemberEmailAlreadyExistsError,
     deactivate_member,
@@ -23,7 +24,6 @@ from app.services.members import (
     register_member,
     update_member,
 )
-from app.services.loans import get_member_loan_history
 
 router = APIRouter()
 staff_required = require_roles(UserRole.ADMIN, UserRole.LIBRARIAN)

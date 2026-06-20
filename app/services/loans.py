@@ -10,6 +10,7 @@ from app.models.loan import Loan, LoanStatus
 from app.models.member import Member
 from app.models.user import User
 from app.schemas.loan import LoanCreate
+from app.services.fines import create_overdue_fine
 
 
 class MemberNotFoundError(Exception):
@@ -101,10 +102,12 @@ def return_book(db: Session, loan_id: UUID, returned_by: User) -> Loan:
     if book is None:
         raise BookNotFoundError
 
+    returned_at = datetime.now(UTC)
     loan.status = LoanStatus.RETURNED
-    loan.returned_at = datetime.now(UTC)
+    loan.returned_at = returned_at
     loan.returned_by_user_id = returned_by.id
     book.available_copies += 1
+    create_overdue_fine(db, loan, returned_at)
     db.commit()
     return get_loan(db, loan.id)  # type: ignore[return-value]
 

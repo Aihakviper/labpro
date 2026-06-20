@@ -10,6 +10,7 @@ from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from app.models.book import Book
+    from app.models.fine import Fine
     from app.models.member import Member
     from app.models.user import User
 
@@ -65,3 +66,7 @@ class Loan(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     book: Mapped["Book"] = relationship(back_populates="loans")
     issued_by: Mapped["User"] = relationship(foreign_keys=[issued_by_user_id])
     returned_by: Mapped["User | None"] = relationship(foreign_keys=[returned_by_user_id])
+    fine: Mapped["Fine | None"] = relationship(
+        back_populates="loan",
+        uselist=False,
+    )

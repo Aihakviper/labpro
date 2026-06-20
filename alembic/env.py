@@ -5,7 +5,16 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from app.core.config import get_settings
 from app.db.base import Base
-from app.models import AuthSession, Book, Loan, Member, User  # noqa: F401
+from app.models import (  # noqa: F401
+    AuthSession,
+    Book,
+    Fine,
+    FineConfig,
+    FinePayment,
+    Loan,
+    Member,
+    User,
+)
 
 config = context.config
 
