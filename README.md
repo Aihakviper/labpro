@@ -108,6 +108,20 @@ Administrators and librarians can manage catalog records:
 Availability is calculated from `total_copies` and `available_copies`. Books with borrowed
 copies cannot be deleted, and total stock cannot be reduced below borrowed stock.
 
+## Borrowing and returning
+
+Administrators and librarians manage loans:
+
+- `POST /api/v1/loans`
+- `GET /api/v1/loans`
+- `GET /api/v1/loans/{loan_id}`
+- `POST /api/v1/loans/{loan_id}/return`
+
+Issuing a book records the borrow and due dates and atomically reduces available copies.
+Returning records the return date and restores one available copy. Inactive members,
+unavailable books, expired due dates, duplicate returns, and members above the configured
+active-loan limit are rejected.
+
 ## Health checks
 
 - `GET /health/live`: confirms that the API process is running.

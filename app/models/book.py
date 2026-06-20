@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import CheckConstraint, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+
+if TYPE_CHECKING:
+    from app.models.loan import Loan
 
 
 class Book(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -23,6 +28,7 @@ class Book(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     publication_year: Mapped[int | None] = mapped_column(Integer)
     total_copies: Mapped[int] = mapped_column(Integer, nullable=False)
     available_copies: Mapped[int] = mapped_column(Integer, nullable=False)
+    loans: Mapped[list["Loan"]] = relationship(back_populates="book")
 
     @property
     def borrowed_copies(self) -> int:

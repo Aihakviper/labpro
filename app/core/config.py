@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = Field(default=30, gt=0)
     refresh_token_expire_days: int = Field(default=7, gt=0)
+    default_loan_period_days: int = Field(default=14, gt=0)
+    max_active_loans_per_member: int = Field(default=5, gt=0)
 
     backend_cors_origins: list[AnyHttpUrl] = Field(default_factory=list)
 

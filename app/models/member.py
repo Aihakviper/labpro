@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from app.models.loan import Loan
     from app.models.user import User
 
 
@@ -43,3 +44,4 @@ class Member(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     deactivated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     user: Mapped["User"] = relationship(back_populates="member_profile")
+    loans: Mapped[list["Loan"]] = relationship(back_populates="member")

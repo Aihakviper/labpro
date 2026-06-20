@@ -12,6 +12,7 @@ from app.models.user import User, UserRole
 from app.schemas.book import BookCreate, BookRead, BookUpdate
 from app.services.books import (
     BookHasBorrowedCopiesError,
+    BookHasLoanHistoryError,
     InvalidInventoryReductionError,
     IsbnAlreadyExistsError,
     create_book,
@@ -119,4 +120,9 @@ def remove_book(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="A book with borrowed copies cannot be deleted",
+        ) from exc
+    except BookHasLoanHistoryError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A book with loan history cannot be deleted",
         ) from exc

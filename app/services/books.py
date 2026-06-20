@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.book import Book
+from app.models.loan import Loan
 from app.schemas.book import BookCreate, BookUpdate, normalize_isbn
 
 
@@ -17,6 +18,10 @@ class InvalidInventoryReductionError(Exception):
 
 
 class BookHasBorrowedCopiesError(Exception):
+    pass
+
+
+class BookHasLoanHistoryError(Exception):
     pass
 
 
@@ -99,5 +104,10 @@ def update_book(db: Session, book: Book, data: BookUpdate) -> Book:
 def delete_book(db: Session, book: Book) -> None:
     if book.borrowed_copies > 0:
         raise BookHasBorrowedCopiesError
+    has_loan_history = db.scalar(
+        select(Loan.id).where(Loan.book_id == book.id).limit(1)
+    )
+    if has_loan_history is not None:
+        raise BookHasLoanHistoryError
     db.delete(book)
     db.commit()

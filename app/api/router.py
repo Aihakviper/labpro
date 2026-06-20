@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import auth, books, health, members, users
+from app.api.routes import auth, books, health, loans, members, users
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -18,4 +18,9 @@ api_router.include_router(
     books.router,
     prefix=f"{settings.api_v1_prefix}/books",
     tags=["books"],
+)
+api_router.include_router(
+    loans.router,
+    prefix=f"{settings.api_v1_prefix}/loans",
+    tags=["loans"],
 )

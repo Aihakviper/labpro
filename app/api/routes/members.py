@@ -23,6 +23,7 @@ from app.services.members import (
     register_member,
     update_member,
 )
+from app.services.loans import get_member_loan_history
 
 router = APIRouter()
 staff_required = require_roles(UserRole.ADMIN, UserRole.LIBRARIAN)
@@ -129,9 +130,21 @@ def read_borrowing_history(
 ) -> BorrowingHistoryRead:
     member = member_or_404(db, member_id)
     ensure_member_access(current_user, member)
+    loans = get_member_loan_history(db, member.id)
     return BorrowingHistoryRead(
         member_id=member.id,
         membership_id=member.membership_id,
-        total=0,
-        items=[],
+        total=len(loans),
+        items=[
+            {
+                "loan_id": loan.id,
+                "book_id": loan.book_id,
+                "book_title": loan.book.title,
+                "borrowed_at": loan.borrowed_at,
+                "due_at": loan.due_at,
+                "returned_at": loan.returned_at,
+                "status": loan.status,
+            }
+            for loan in loans
+        ],
     )
