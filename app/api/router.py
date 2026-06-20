@@ -8,6 +8,7 @@ from app.api.routes import (
     loans,
     members,
     notifications,
+    reports,
     reservations,
     users,
 )
@@ -48,4 +49,9 @@ api_router.include_router(
     notifications.router,
     prefix=f"{settings.api_v1_prefix}/notifications",
     tags=["notifications"],
+)
+api_router.include_router(
+    reports.router,
+    prefix=f"{settings.api_v1_prefix}/reports",
+    tags=["reports"],
 )

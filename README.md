@@ -175,6 +175,19 @@ Member endpoints:
 Staff can run `POST /api/v1/notifications/process-overdue`. This endpoint is idempotent per
 loan and calendar day and can later be called by a cron job or task scheduler.
 
+## Reporting and analytics
+
+Administrators and librarians can generate live JSON reports:
+
+- `GET /api/v1/reports/borrowed-books`
+- `GET /api/v1/reports/overdue-items`
+- `GET /api/v1/reports/member-activities`
+- `GET /api/v1/reports/fines`
+- `GET /api/v1/reports/inventory`
+
+Reports include aggregate totals and detailed rows. Loan, member-activity, and fine reports
+support date ranges. Inventory supports category and low-stock filtering.
+
 ## Health checks
 
 - `GET /health/live`: confirms that the API process is running.
