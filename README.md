@@ -215,6 +215,9 @@ Render must define:
 BACKEND_CORS_ORIGINS=["https://labpro-seven.vercel.app"]
 ```
 
+Render's `postgresql://` database URL is automatically normalized to SQLAlchemy's Psycopg 3
+driver URL, `postgresql+psycopg://`.
+
 ## Demo data and browser acceptance testing
 
 After applying migrations, populate a realistic Nigerian demo dataset:

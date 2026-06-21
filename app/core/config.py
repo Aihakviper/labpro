@@ -2,7 +2,7 @@ from decimal import Decimal
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import AnyHttpUrl, Field, SecretStr
+from pydantic import AnyHttpUrl, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,6 +30,17 @@ class Settings(BaseSettings):
     default_fine_rate_per_day: Decimal = Field(default=Decimal("100.00"), ge=0)
 
     backend_cors_origins: list[AnyHttpUrl] = Field(default_factory=list)
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def use_psycopg3_driver(cls, value: object) -> object:
+        if not isinstance(value, str):
+            return value
+        if value.startswith("postgres://"):
+            return value.replace("postgres://", "postgresql+psycopg://", 1)
+        if value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+psycopg://", 1)
+        return value
 
 
 @lru_cache
