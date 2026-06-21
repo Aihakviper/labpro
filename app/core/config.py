@@ -31,6 +31,10 @@ class Settings(BaseSettings):
 
     backend_cors_origins: list[AnyHttpUrl] = Field(default_factory=list)
 
+    @property
+    def cors_origins(self) -> list[str]:
+        return [str(origin).rstrip("/") for origin in self.backend_cors_origins]
+
     @field_validator("database_url", mode="before")
     @classmethod
     def use_psycopg3_driver(cls, value: object) -> object:

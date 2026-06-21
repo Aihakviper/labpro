@@ -28,3 +28,19 @@ def test_explicit_psycopg_url_is_unchanged() -> None:
     database_url = "postgresql+psycopg://user:password@host/database"
 
     assert make_settings(database_url).database_url == database_url
+
+
+def test_cors_origins_do_not_include_trailing_slashes() -> None:
+    settings = Settings(
+        database_url="postgresql://user:password@host/database",
+        jwt_secret_key="test-secret-key-with-at-least-32-characters",
+        backend_cors_origins=[
+            "https://labpro-seven.vercel.app",
+            "http://localhost:8000/",
+        ],
+    )
+
+    assert settings.cors_origins == [
+        "https://labpro-seven.vercel.app",
+        "http://localhost:8000",
+    ]
