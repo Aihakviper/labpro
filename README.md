@@ -43,6 +43,11 @@ outside this phase.
 The API documentation is available at `http://localhost:8000/docs`.
 The Librarian Pro dashboard is available at `http://localhost:8000/`.
 
+Production deployments:
+
+- Frontend: `https://labpro-seven.vercel.app`
+- Backend: `https://librarian-pro-api.onrender.com`
+
 ## Authentication
 
 `POST /api/v1/auth/login` uses OAuth2 form fields:
@@ -200,6 +205,38 @@ JavaScript, and Bootstrap. It includes:
 - issue, return, payment, cancellation, and reporting workflows
 
 No Node.js build step is required.
+
+The frontend automatically uses `/api/v1` on localhost and
+`https://librarian-pro-api.onrender.com/api/v1` on deployed hosts.
+
+Render must define:
+
+```env
+BACKEND_CORS_ORIGINS=["https://labpro-seven.vercel.app"]
+```
+
+## Demo data and browser acceptance testing
+
+After applying migrations, populate a realistic Nigerian demo dataset:
+
+```powershell
+python -m app.scripts.seed_demo
+```
+
+Demo accounts share the password `DemoPassword123!`:
+
+- `admin@librarianpro.ng`
+- `librarian@librarianpro.ng`
+- `fatima.member@librarianpro.ng`
+
+The seed command is safe to rerun. Browser acceptance checks use installed Chrome:
+
+```powershell
+npm.cmd install --no-save --no-package-lock playwright-core
+node tests\acceptance_ui.mjs
+```
+
+Acceptance screenshots are written to `.local/acceptance/`.
 
 ## Health checks
 

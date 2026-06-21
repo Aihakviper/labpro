@@ -126,15 +126,10 @@ def record_payment(
     amount: Decimal,
     recorded_by: User,
 ) -> Fine:
-    fine = (
-        db.execute(
-            select(Fine)
-            .options(joinedload(Fine.payments), joinedload(Fine.loan))
-            .where(Fine.id == fine_id)
-            .with_for_update()
-        )
-        .unique()
-        .scalar_one_or_none()
+    fine = db.scalar(
+        select(Fine)
+        .where(Fine.id == fine_id)
+        .with_for_update()
     )
     if fine is None:
         raise FineNotFoundError

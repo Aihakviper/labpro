@@ -11,4 +11,8 @@ build/
 *.egg-info/
 .idea/
 .vscode/
+.local/
+playwright-report/
+test-results/
+node_modules/
 

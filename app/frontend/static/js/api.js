@@ -1,4 +1,7 @@
-const API_PREFIX = "/api/v1";
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1"]);
+const API_PREFIX = LOCAL_HOSTS.has(window.location.hostname)
+  ? "/api/v1"
+  : "https://librarian-pro-api.onrender.com/api/v1";
 const ACCESS_KEY = "librarian_pro_access_token";
 const REFRESH_KEY = "librarian_pro_refresh_token";
 
