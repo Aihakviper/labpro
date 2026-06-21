@@ -41,6 +41,7 @@ outside this phase.
    ```
 
 The API documentation is available at `http://localhost:8000/docs`.
+The Librarian Pro dashboard is available at `http://localhost:8000/`.
 
 ## Authentication
 
@@ -187,6 +188,18 @@ Administrators and librarians can generate live JSON reports:
 
 Reports include aggregate totals and detailed rows. Loan, member-activity, and fine reports
 support date ranges. Inventory supports category and low-stock filtering.
+
+## Frontend
+
+The responsive frontend is served directly by FastAPI and uses HTML, local CSS, vanilla
+JavaScript, and Bootstrap. It includes:
+
+- login and role-aware navigation
+- administrator/librarian and member dashboards
+- book, member, loan, fine, reservation, user, notification, and report pages
+- issue, return, payment, cancellation, and reporting workflows
+
+No Node.js build step is required.
 
 ## Health checks
 
